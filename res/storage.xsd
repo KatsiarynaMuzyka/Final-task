@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/storage"
+	xmlns:tns="http://www.example.org/storage" elementFormDefault="qualified">
+
+	<element name="tests">
+		<complexType>
+			<sequence>
+				<element name="positive-test" type="tns:data" minOccurs="1"
+					maxOccurs="10" />
+					<element name="negative-test" type="tns:data" minOccurs="1"
+					maxOccurs="10" />
+			</sequence>
+		</complexType>
+	</element>
+
+	<complexType name="data">
+		<sequence>
+
+			<element name="REGISTRATION-command" type="string" />
+			<element name="AUTHORIZATION-command" type="string" />
+			<element name="SHOW_SUBJECT-command" type="string" />
+			<element name="GO_TESTING-command" type="string" />
+			<element name="SHOW_QUESTION-command" type="string" />
+			<element name="CREATE_NEW_QUESTION-command" type="string" />
+			<element name="CREATE_NEW_SUBJECT-command" type="string" />
+			<element name="subjectID" type="int" />
+			<element name="login" type="string" />
+			<element name="password" type="string" />
+			<element name="answer" type="int" />
+			<element name="question" type="string" />
+			<element name="subjectName" type="string" />
+
+		</sequence>
+
+		<attribute name="id" use="required">
+		</attribute>
+
+	</complexType>
+
+
+</schema>
