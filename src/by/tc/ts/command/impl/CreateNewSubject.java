@@ -27,16 +27,15 @@ public class CreateNewSubject implements Command{
 			if (DAOFactory.getInstance().getTestingSystem().createNewSubject(subjectName)) {
 
 				response.setErrorStatus(false);
-				response.setResultMessage("Вопрос добавлен");
+				response.setResultMessage("Предмет добавлен");
 
 			} else {
 				response.setErrorStatus(true);
-				response.setErrorMessage("Ошибка");
+				response.setErrorMessage("Ошибка в добавлении предмета");
 			}
 		} catch (DAOException e) {
-			e.printStackTrace();
 			response.setErrorStatus(true);
-			response.setErrorMessage("Ошибка");
+			response.setErrorMessage(e.getMessage());
 			return response;
 		}
 		return response;

@@ -1,5 +1,7 @@
 package by.tc.ts.command.impl;
 
+import java.util.List;
+
 import by.tc.ts.bean.Request;
 import by.tc.ts.bean.Response;
 import by.tc.ts.bean.ShowQuestionListRequest;
@@ -8,7 +10,7 @@ import by.tc.ts.command.exception.CommandException;
 import by.tc.ts.service.ServiceFactory;
 import by.tc.ts.service.exception.ServiceException;
 
-public class ShowQuestionList implements Command{
+public class ShowQuestionList implements Command {
 
 	@Override
 	public Response execute(Request request) throws CommandException {
@@ -21,12 +23,17 @@ public class ShowQuestionList implements Command{
 			throw new CommandException("Неверный запрос");
 		}
 
+		List<String> showQuestList;
 		Response response = new Response();
 
 		String subjName = req.getSubjName();
 
 		try {
-			if (ServiceFactory.getInstance().getTestingSystemService().showQuestionList(subjName)) {
+
+			showQuestList = ServiceFactory.getInstance().getTestingSystemService().showQuestionList(subjName);
+			if (showQuestList != null) {
+
+				response.setShowQuestList(showQuestList);
 				response.setErrorStatus(false);
 				response.setResultMessage("Завершено успешно");
 			} else {
@@ -35,13 +42,11 @@ public class ShowQuestionList implements Command{
 			}
 		} catch (ServiceException e) {
 			response.setErrorStatus(true);
-			response.setErrorMessage("Вопросов не найдено");
-			e.printStackTrace();
+			response.setErrorMessage(e.getMessage());
+			return response;
 		}
 
 		return response;
 	}
-	
-	
 
 }

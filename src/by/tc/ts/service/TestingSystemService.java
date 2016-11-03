@@ -1,13 +1,15 @@
 package by.tc.ts.service;
 
+import java.util.List;
+
 import by.tc.ts.service.exception.ServiceException;
 
 public interface TestingSystemService {
 
-	public boolean showQuestionList(String subjName) throws ServiceException;
+	public List<String> showQuestionList(String subjName) throws ServiceException;
 
-	public boolean showSubjectList() throws ServiceException;
+	public List<String> showSubjectList() throws ServiceException;
 
-	public boolean startTest(String subjName) throws ServiceException;
+	public Object[][] startTest(String subjName) throws ServiceException;
 
 }

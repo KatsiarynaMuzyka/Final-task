@@ -9,98 +9,84 @@ import by.tc.ts.dao.factory.DAOFactory;
 import by.tc.ts.service.TestingSystemService;
 import by.tc.ts.service.exception.ServiceException;
 
-public class TestingSystemServiceImpl implements TestingSystemService{
+public class TestingSystemServiceImpl implements TestingSystemService {
 
-	List<String> list = new ArrayList<>();
-	List<Integer> answer = new ArrayList<>();
-	List<Integer> chek = new ArrayList<Integer>();
 	Scanner in = new Scanner(System.in);
-	
+
 	@Override
-	public boolean showQuestionList(String subjName) throws ServiceException {
+	public List<String> showQuestionList(String subjName) throws ServiceException {
+		
+		subjName = subjName.trim();
 
-		if (subjName == null||subjName.equals("")||subjName.equals(" ")) {
-			throw new ServiceException("Введите корректный номер предмета");
+		if (subjName == null || subjName.length() < 1) {
+			throw new ServiceException("Введите корректное имя предмета");
 		}
-		list.clear();
+		
+		List<String> showQuestList = new ArrayList<>();
+		
+		showQuestList.clear();
+
 		try {
-			list = DAOFactory.getInstance().getTestingSystem().showQuestionList(subjName);
-			for (String quest : list) {
-				System.out.println(quest);
-				System.out.println();
-			}
+			showQuestList = DAOFactory.getInstance().getTestingSystem().showQuestionList(subjName);
+
 		} catch (DAOException e) {
-			e.printStackTrace();
-			return false;
+			throw new ServiceException(e.getMessage());
 		}
 
-		if (list != null) {
-			return true;
+		if (showQuestList != null) {
+			return showQuestList;
 		} else {
-			return false;
+			return null;
 		}
 	}
 
 	@Override
-	public boolean showSubjectList() throws ServiceException {
+	public List<String> showSubjectList() throws ServiceException {
 
-		list.clear();
+		List<String> showSubjList = new ArrayList<>();
+		showSubjList.clear();
 		try {
-			list = DAOFactory.getInstance().getTestingSystem().showSubjList();
-			for (String sub : list) {
-				
-				System.out.println(sub);
-				System.out.println();
-			}
-			if (list != null) {
-				return true;
+			showSubjList = DAOFactory.getInstance().getTestingSystem().showSubjList();
+
+			if (showSubjList != null) {
+				return showSubjList;
 			} else {
-				return false;
+				return null;
 			}
 		} catch (DAOException e) {
-
-			e.printStackTrace();
-			return false;
+			throw new ServiceException(e.getMessage());
 		}
 	}
 
 	@Override
-	public boolean startTest(String subjName) throws ServiceException {
+	public Object[][] startTest(String subjName) throws ServiceException {
 
-		int choise;
+		subjName = subjName.trim();
+		
+		if (subjName == null || subjName.length() < 1) {
+			throw new ServiceException("Введите корректное имя предмета");
+		}
+
+		Object test[][] = new Object[1][2];
+		List<Integer> answer = new ArrayList<>();
+		List<String> testList = new ArrayList<>();
+				
 
 		answer.clear();
-		list.clear();
+		testList.clear();
 		try {
 
 			answer = DAOFactory.getInstance().getTestingSystem().startTest(subjName);
-			list = DAOFactory.getInstance().getTestingSystem().showQuestionList(subjName);
+			testList = DAOFactory.getInstance().getTestingSystem().showQuestionList(subjName);
+
+			test[0][0] = answer;
+			test[0][1] = testList;
 
 		} catch (DAOException e) {
-			e.printStackTrace();
-			return false;
+			throw new ServiceException(e.getMessage());
 		}
 
-		for (int i = 0; i < answer.size(); i++) {
-			System.out.println(list.get(i));
-			System.out.println();
-			System.out.println("Сделайте выбор");
-			choise = in.nextInt();
-			chek.add(choise);
-		}
-
-		int point = 0;
-		double mark = 0;
-
-		for (int i = 0; i < answer.size(); i++) {
-			if (answer.get(i) == chek.get(i)) {
-				point++;
-			}
-		}
-		mark = (double) point / answer.size() * 100;
-		System.out.println("Ваша оценка: " + mark + " из 100.0");
-
-		return true;
+		return test;
 	}
 
 }

@@ -7,20 +7,24 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import by.tc.ts.dao.TestingSystemDAO;
 import by.tc.ts.dao.exception.DAOException;
+import by.tc.ts.service.exception.ServiceException;
 import by.tc.ts.source.SQLConnection;
 
-
 public class TestingSystemDAOImpl implements TestingSystemDAO {
-	
+
 	List<String> tempList = new ArrayList<>();
 	List<Integer> answerList = new ArrayList<>();
-	
 
 	@Override
 	public boolean createNewSubject(String subjName) throws DAOException {
+
+		subjName = subjName.trim();
+
+		if (subjName == null || subjName.length() < 1) {
+			throw new DAOException("Введите корректное имя предмета");
+		}
 
 		Connection con = null;
 		Statement st = null;
@@ -36,37 +40,37 @@ public class TestingSystemDAOImpl implements TestingSystemDAO {
 			} else {
 				return false;
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		} finally {
 			if (con != null) {
 				try {
 					SQLConnection.getInstance().returnConnection(con);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (SQLException | InterruptedException e) {
+					throw new DAOException(e.getMessage());
 				}
 			}
 		}
-
-		return false;
 	}
 
 	@Override
 	public boolean createNewQuestion(String question, int answer, String subjName) throws DAOException {
 
+		subjName = subjName.trim();
+		question = question.trim();
+
+		if ((subjName == null || subjName.length() < 1) || (question == null || question.length() < 21)
+				|| (answer != 1 || answer != 2 || answer != 3 || answer != 4)) {
+			throw new DAOException("Введите корректное имя предмета, вопрос и ответ");
+		}
 		Connection con = null;
 
 		try {
 			con = SQLConnection.getInstance().getConnection();
 			try (Statement st = con.createStatement()) {
 
-				int result = st.executeUpdate("INSERT INTO questions(subject_name, question, answer) VALUES('" + subjName
-						+ "','" + question + "','" + answer + "');");
+				int result = st.executeUpdate("INSERT INTO questions(subject_name, question, answer) VALUES('"
+						+ subjName + "','" + question + "','" + answer + "');");
 				st.close();
 				if (result != 0) {
 					return true;
@@ -74,21 +78,17 @@ public class TestingSystemDAOImpl implements TestingSystemDAO {
 					return false;
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
-				return false;
+				throw new DAOException(e.getMessage());
 
 			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
-			return false;
+			throw new DAOException(e.getMessage());
 		} finally {
 			if (con != null) {
 				try {
 					SQLConnection.getInstance().returnConnection(con);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (SQLException | InterruptedException e) {
+					throw new DAOException(e.getMessage());
 				}
 			}
 		}
@@ -105,9 +105,8 @@ public class TestingSystemDAOImpl implements TestingSystemDAO {
 			st = con.createStatement();
 			ResultSet result = st.executeQuery("SELECT * FROM questions WHERE subject_name = '" + subjName + "';");
 			if (result.next() == false) {
-				System.out.println("Вопросов не найдено");
 				st.close();
-				return null;
+				throw new DAOException("Вопросов не найдено");
 			} else {
 				do {
 					tempList.add(result.getString("question"));
@@ -115,25 +114,16 @@ public class TestingSystemDAOImpl implements TestingSystemDAO {
 				st.close();
 			}
 			return tempList;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		} finally {
 			if (con != null)
 				try {
 					SQLConnection.getInstance().returnConnection(con);
-				} catch (SQLException e) {
-
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (SQLException | InterruptedException e) {
+					throw new DAOException(e.getMessage());
 				}
 		}
-
-		return null;
 	}
 
 	@Override
@@ -157,30 +147,20 @@ public class TestingSystemDAOImpl implements TestingSystemDAO {
 				st.close();
 			}
 			return tempList;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		} finally {
 			if (con != null)
 				try {
 					SQLConnection.getInstance().returnConnection(con);
-				} catch (SQLException e) {
-
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (SQLException | InterruptedException e) {
+					throw new DAOException(e.getMessage());
 				}
 		}
-		
-		return null;
 	}
 
 	@Override
 	public List<Integer> startTest(String subjName) throws DAOException {
-
 		Connection con = null;
 		Statement st = null;
 		answerList.clear();
@@ -199,64 +179,49 @@ public class TestingSystemDAOImpl implements TestingSystemDAO {
 				st.close();
 			}
 			return answerList;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		} finally {
 			if (con != null)
 				try {
 					SQLConnection.getInstance().returnConnection(con);
-				} catch (SQLException e) {
-
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (SQLException | InterruptedException e) {
+					throw new DAOException(e.getMessage());
 				}
 		}
 
-		return null;
-	
 	}
-	
+
+	// ************************************** ////////////////
+
 	@Override
-	public void deleteAllQuestions() throws DAOException{
+	public void deleteAllQuestions() throws DAOException {
 		Connection con = null;
 		Statement st = null;
-		
+
 		try {
 			con = SQLConnection.getInstance().getConnection();
 			st = con.createStatement();
 			int testKILL = st.executeUpdate("DELETE FROM questions Where id>=0");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		}
-		
+
 	}
-	
+
 	@Override
-	public void deleteAllSubjects() throws DAOException{
+	public void deleteAllSubjects() throws DAOException {
 		Connection con = null;
 		Statement st = null;
-		
+
 		try {
 			con = SQLConnection.getInstance().getConnection();
 			st = con.createStatement();
 			int subDEL = st.executeUpdate("DELETE FROM subjects Where id>=0");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		}
-		
+
 	}
 
 }

@@ -15,6 +15,13 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public boolean registration(String login, String password) throws DAOException {
 
+		login = login.trim();
+		password = password.trim();
+		
+		if ((login == null || login.length() < 1) || (password == null || password.length() < 1)) {
+			throw new DAOException("¬ведите корректные логин и пароль");
+		}
+		
 		Connection con = null;
 		Statement st = null;
 
@@ -22,19 +29,18 @@ public class UserDAOImpl implements UserDAO {
 
 			con = SQLConnection.getInstance().getConnection();
 			st = con.createStatement();
-			int result = st.executeUpdate(
-					"INSERT INTO users (login, password) VALUES ('" + login + "', '" + password + "');");
+			int result = st
+					.executeUpdate("INSERT INTO users (login, password) VALUES ('" + login + "', '" + password + "');");
 			if (result != 0) {
 				return true;
 			} else {
 				return false;
 			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			
+			
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		}
 
 		finally {
@@ -42,21 +48,27 @@ public class UserDAOImpl implements UserDAO {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					throw new DAOException(e.getMessage());
 				}
 			}
 			try {
 				SQLConnection.getInstance().returnConnection(con);
-			} catch (SQLException e) {
-			} catch (InterruptedException e) {
+			} catch (SQLException | InterruptedException e) {
+				throw new DAOException(e.getMessage());
 			}
 		}
-
-		return false;
 	}
 
 	@Override
 	public boolean logination(String login, String password) throws DAOException {
 
+		login = login.trim();
+		password = password.trim();
+		
+		if ((login == null || login.length() < 1) || (password == null || password.length() < 1)) {
+			throw new DAOException("¬ведите корректные логин и пароль");
+		}
+		
 		Connection con = null;
 		Statement st = null;
 
@@ -64,8 +76,8 @@ public class UserDAOImpl implements UserDAO {
 			con = SQLConnection.getInstance().getConnection();
 			st = con.createStatement();
 
-			ResultSet result = st.executeQuery(
-					"SELECT id FROM users WHERE(login, password)=('" + login + "','" + password + "');");
+			ResultSet result = st
+					.executeQuery("SELECT id FROM users WHERE(login, password)=('" + login + "','" + password + "');");
 			if (result.next() == false) {
 				return false;
 			} else {
@@ -75,29 +87,24 @@ public class UserDAOImpl implements UserDAO {
 				return true;
 			}
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					throw new DAOException(e.getMessage());
 				}
 			}
 			try {
 				SQLConnection.getInstance().returnConnection(con);
-			} catch (SQLException e) {
-			} catch (InterruptedException e) {
+			} catch (SQLException | InterruptedException e) {
+				throw new DAOException(e.getMessage());
 			}
 		}
-
-		return false;
 	}
-	
+
 	public void deleteUser(String login, String password) throws DAOException {
 
 		Connection con = null;
@@ -108,23 +115,20 @@ public class UserDAOImpl implements UserDAO {
 			st = con.createStatement();
 			int result = st
 					.executeUpdate("DELETE FROM users Where(login, password)=('" + login + "','" + password + "');");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (SQLException | InterruptedException e) {
+			throw new DAOException(e.getMessage());
 		} finally {
 			if (st != null) {
 				try {
 					st.close();
 				} catch (SQLException e) {
+					throw new DAOException(e.getMessage());
 				}
 			}
 			try {
 				SQLConnection.getInstance().returnConnection(con);
-			} catch (SQLException e) {
-			} catch (InterruptedException e) {
+			} catch (SQLException | InterruptedException e) {
+				throw new DAOException(e.getMessage());
 			}
 		}
 

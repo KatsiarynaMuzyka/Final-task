@@ -34,8 +34,11 @@ public class Registration implements Command {
 				response.setErrorMessage("Невозможно добавить пользователя с логином " + login + " и паролем " + password);
 			}
 		} catch (DAOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// добавить респонсе и ретурн
+			
+			response.setErrorStatus(true);
+			response.setErrorMessage(e.getMessage());
+			return response;
 		}
 
 		return response;

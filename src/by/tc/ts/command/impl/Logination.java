@@ -35,7 +35,9 @@ public class Logination implements Command{
 				response.setErrorMessage("В базе отсутствует пользователь с логином " + login + " и паролем " + password);
 			}
 		} catch (DAOException e) {
-			e.printStackTrace();
+			response.setErrorStatus(true);
+			response.setErrorMessage(e.getMessage());
+			return response;
 		}
 		
 		return response;

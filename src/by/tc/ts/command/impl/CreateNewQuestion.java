@@ -34,12 +34,11 @@ public class CreateNewQuestion implements Command {
 
 			} else {
 				response.setErrorStatus(true);
-				response.setErrorMessage("Ошибка");
+				response.setErrorMessage("Ошибка в добавлении вопроса");
 			}
 		} catch (DAOException e) {
-			e.printStackTrace();
 			response.setErrorStatus(true);
-			response.setErrorMessage("Ошибка");
+			response.setErrorMessage(e.getMessage());
 			return response;
 		}
 		return response;
